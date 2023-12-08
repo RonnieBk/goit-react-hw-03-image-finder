@@ -12,5 +12,5 @@ export default async function getData(query, pageN) {
     },
   });
   console.log(response);
-  return response.data;
+  return await response.data;
 }
