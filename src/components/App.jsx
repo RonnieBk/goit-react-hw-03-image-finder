@@ -21,44 +21,32 @@ const INITIAL_STATE = {
 export class App extends Component {
   state = { ...INITIAL_STATE };
 
-  componentDidMount() {
-    console.log('didMount');
-  }
-
   handleSubmit = async evt => {
     evt.preventDefault();
-    // this.setState({ ...INITIAL_STATE, isLoading: true });
-    console.log('submit', this.state);
-    this.setState({ isLoading: true });
     const form = evt.target;
     const query = form.elements.input.value;
+    this.setState({ ...INITIAL_STATE, query, isLoading: true });
     try {
       const data = await getData(query, this.state.currentPage);
       const images = await data.hits;
-      console.log('data', data);
-      console.log('images', images);
-      this.setState({ images, query, totalHits: data.total });
+      this.setState({ images, totalHits: data.total });
     } catch (error) {
       this.setState({ error: error.message });
     } finally {
       this.setState({ isLoading: false });
-      console.log(this.state);
     }
   };
 
   handleMore = async () => {
-    console.log('click', this.state);
     this.setState({ isLoading: true, error: '' });
     const { images, query, currentPage } = this.state;
     try {
       const nextImages = await getData(query, currentPage + 1);
-      // const newArray = images.concat(nextImages.hits);
       this.setState({
         images: [...images, ...nextImages.hits],
         currentPage: currentPage + 1,
       });
     } catch (error) {
-      console.log(error);
       this.setState({ error: error.message });
     } finally {
       this.setState({ isLoading: false });

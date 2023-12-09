@@ -11,6 +11,5 @@ export default async function getData(query, pageN) {
       per_page: 12,
     },
   });
-  console.log(response);
   return await response.data;
 }
