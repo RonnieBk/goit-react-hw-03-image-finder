@@ -24,7 +24,8 @@ export class App extends Component {
   shouldComponentUpdate(_, nextState) {
     if (
       nextState.query !== this.state.query ||
-      nextState.currentPage !== this.state.currentPage
+      nextState.currentPage !== this.state.currentPage ||
+      nextState.isModal !== this.state.isModal
     ) {
       return true;
     }
