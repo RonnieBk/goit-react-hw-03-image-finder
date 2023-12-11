@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 
 export const ImageGalleryItem = ({ image, largeImg, tags, onClick }) => {
   return (
-    <li className={css.item} onClick={onClick}>
-      <img className={css.image} src={image} alt={tags} data-link={largeImg} />
+    <li className={css.item} onClick={() => onClick(largeImg)}>
+      <img className={css.image} src={image} alt={tags} />
     </li>
   );
 };

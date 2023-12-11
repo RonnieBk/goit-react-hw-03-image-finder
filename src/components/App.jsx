@@ -21,41 +21,50 @@ const INITIAL_STATE = {
 export class App extends Component {
   state = { ...INITIAL_STATE };
 
-  handleSubmit = async evt => {
-    evt.preventDefault();
-    const form = evt.target;
-    const query = form.elements.input.value;
-    this.setState({ ...INITIAL_STATE, query, isLoading: true });
+  shouldComponentUpdate(_, nextState) {
+    if (
+      nextState.query !== this.state.query ||
+      nextState.currentPage !== this.state.currentPage
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  fetchImages = async (query, page) => {
+    this.setState({ isLoading: true, error: '' });
     try {
-      const data = await getData(query, this.state.currentPage);
-      const images = await data.hits;
-      this.setState({ images, totalHits: data.total });
+      const data = await getData(query, page);
+      return data;
     } catch (error) {
       this.setState({ error: error.message });
     } finally {
       this.setState({ isLoading: false });
     }
+  };
+
+  handleSubmit = async evt => {
+    evt.preventDefault();
+
+    const form = evt.target;
+    const query = form.elements.input.value;
+    const data = await this.fetchImages(query, 1);
+    const images = data.hits;
+
+    this.setState({ images, query, totalHits: data.total, currentPage: 1 });
   };
 
   handleMore = async () => {
-    this.setState({ isLoading: true, error: '' });
     const { images, query, currentPage } = this.state;
-    try {
-      const nextImages = await getData(query, currentPage + 1);
-      this.setState({
-        images: [...images, ...nextImages.hits],
-        currentPage: currentPage + 1,
-      });
-    } catch (error) {
-      this.setState({ error: error.message });
-    } finally {
-      this.setState({ isLoading: false });
-    }
+    const nextImages = await this.fetchImages(query, currentPage + 1);
+    this.setState({
+      images: [...images, ...nextImages.hits],
+      currentPage: currentPage + 1,
+    });
   };
 
-  clickImage = evt => {
-    const imgUrl = evt.target.dataset.link;
-    this.setState({ isModal: true, selectedImage: imgUrl });
+  clickImage = largeImgUrl => {
+    this.setState({ isModal: true, selectedImage: largeImgUrl });
   };
 
   closeModal = () => {
